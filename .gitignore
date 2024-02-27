@@ -1,0 +1,49 @@
+# Dependency directories
+node_modules/
+
+# Testing
+coverage/
+
+# Environment variables
+.env
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Compiled binary addons
+build/Release
+
+# Dependency lock files
+yarn.lock
+package-lock.json
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# Visual Studio Code settings
+.vscode/
+
+# IntelliJ settings
+.idea/
+
+# Sublime Text settings
+.sublime*
+
+# Logs
+logs
+*.log
+
+# Output
+dist/
