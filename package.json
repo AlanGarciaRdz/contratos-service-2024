@@ -1,0 +1,20 @@
+{
+  "name": "contratos",
+  "version": "1.1.0",
+  "main": "server",
+  "engines": {
+    "node": ">=0.10.22"
+  },
+  "scripts": {
+    "dev": "export NODE_ENV=development && npx nodemon app.js",
+    "deploy": "rsync  -rave --progress -e \"ssh -i ~/Desktop/monitoreo.pem\" -r --exclude node_modules/ ./* ec2-user@ec2-35-173-126-147.compute-1.amazonaws.com:/opt/servicios/contratos"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1"
+  },
+  "keywords": [
+    "mvc",
+    "boilerplate"
+  ]
+}
