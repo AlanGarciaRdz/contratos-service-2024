@@ -18,7 +18,7 @@ module.exports = function (app) {
     });
   });
 
-  app.post("/clave", function (req, res) {
+  app.get("/clave", function (req, res) {
     // Generate a random integer between 0 and 4294967295 (2^32 - 1)
     const randomDecimal = Math.floor(Math.random() * 4294967296);
 
