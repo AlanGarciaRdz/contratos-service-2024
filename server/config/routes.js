@@ -1,4 +1,5 @@
-var fs = require("fs");
+let fs = require("fs");
+let path = require("path")
 
 module.exports = function (app) {
   app.use(function (req, res, next) {
@@ -39,7 +40,6 @@ module.exports = function (app) {
     let writer = fs.createWriteStream(contratoFileName);
 
     response = {
-      clave_reservacion: req.body.clave_reservacion,
       fecha_contrato: req.body.fecha_contrato,
       nombre_contratante: req.body.nombre_contratante,
       telefono_contratante: req.body.telefono_contratante,
@@ -53,9 +53,7 @@ module.exports = function (app) {
       horasalida_itineario: req.body.horasalida_itineario,
       direccionsalida_itinerario: req.body.direccionsalida_itinerario,
       ubicacion_direccion_salida_itinerario:
-        req.body.ubicacion_direccion_salida_itinerario,
-      colonia_itineario: req.body.colonia_itineario,
-      ciudad_itineario: req.body.ciudad_itineario,
+      req.body.ubicacion_direccion_salida_itinerario,
       entrecalles_itinerario: req.body.entrecalles_itinerario,
       referencias_itinerario: req.body.referencias_itinerario,
       detalles_itineario: req.body.detalles_itineario,
@@ -80,7 +78,7 @@ module.exports = function (app) {
   });
 
   app.get("/", function (req, res) {
-    var files = fs.readdirSync("./contratos");
+    let files = fs.readdirSync("./contratos");
     res.json(files);
   });
 
@@ -93,7 +91,12 @@ module.exports = function (app) {
           .send(`No se encontro contrato ${req.params.nombre_contrato}`);
         return;
       }
-      res.send(data.toString());
+
+      const jsonData = JSON.parse(data);
+      // Add nombre_contrato to the existing JSON object
+      jsonData.nombre_contrato = req.params.nombre_contrato;
+
+      res.send(jsonData);
     });
   });
 };
