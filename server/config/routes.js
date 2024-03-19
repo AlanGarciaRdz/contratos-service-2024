@@ -20,16 +20,18 @@ module.exports = function (app) {
   });
 
   app.get("/clave", function (req, res) {
-    // Generate a random integer between 0 and 4294967295 (2^32 - 1)
-    const randomDecimal = Math.floor(Math.random() * 4294967296);
+    const currentDate = new Date();
 
-    // Convert the decimal to hexadecimal with a fixed length of 10 characters
-    const randomHex = randomDecimal
-      .toString(16)
-      .toUpperCase()
-      .padStart(10, "0");
+    // Get the current timestamp (milliseconds since Unix epoch)
+    const currentTime = currentDate.getTime();
 
-    res.send(randomHex);
+    // Convert the timestamp to a hexadecimal string
+    const hexadecimal = currentTime.toString(16).toUpperCase().slice(-6);
+
+    const year = currentDate.getFullYear() % 100; // Get only the last two digits of the year
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+    const clave = `${year}${hexadecimal}${month}`
+    res.send(clave);
   });
 
   app.post("/guardar", function (req, res) {
