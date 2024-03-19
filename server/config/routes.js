@@ -34,6 +34,93 @@ module.exports = function (app) {
     res.send(clave);
   });
 
+  app.get("/fix", function (req, res) {
+    const fs = require("fs");
+    const path = require("path");
+
+    const contratosFolder = "./contratos/";
+    const contratosFolderD = "./contratos/";
+
+    function parseDateFromString(dateString) {
+      const parts = dateString.split('/');
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1; // Months are 0-indexed in JavaScript
+      const year = parseInt(parts[2], 10);
+      return new Date(year, month, day);
+    }
+
+    function ensureDirectoryExists(directory) {
+      if (!fs.existsSync(directory)) {
+        fs.mkdirSync(directory, { recursive: true });
+      }
+    }
+    let count= 0
+
+    fs.readdir(contratosFolder, (err, files) => {
+      if (err) {
+        console.error("Error reading directory:", err);
+        return;
+      }
+
+      files.forEach((file) => {
+
+        const filePath = path.join(contratosFolder, file);
+        fs.readFile(filePath, "utf8", (err, data) => {
+          if (err) {
+            console.error("Error reading file:", err);
+            res.send("Error reading file:");
+            return;
+          }
+
+          try {
+            const contratoData = JSON.parse(data);
+            const fechaContrato = contratoData.fecha_contrato;
+
+            // Extract year and month from fecha_contrato
+            let fechaContratoDate = new Date(fechaContrato);
+
+            if (isNaN(fechaContratoDate.getTime())) {
+              // Date is not valid, parse it from string
+              fechaContratoDate = parseDateFromString(fechaContrato);
+            }
+
+
+            const year = String(fechaContratoDate.getFullYear() % 100); // Extract last two digits of year
+            const month = String(fechaContratoDate.getMonth() + 1).padStart(2,"0"); // Months are 0-indexed
+
+
+           // Construct new filename
+           const newFilename = `${year}${file.replace(/\.[^/.]+$/, "")}${month}`;
+           const yearFolder = path.join(contratosFolderD, year);
+           const monthFolder = path.join(yearFolder, month);
+           const newFilePath = path.join(monthFolder, newFilename);
+
+           // Ensure year folder exists
+           ensureDirectoryExists(yearFolder);
+           // Ensure month folder exists
+           ensureDirectoryExists(monthFolder);
+
+
+            // Rename the file
+            fs.rename(filePath, newFilePath, (err) => {
+              if (err) {
+                console.error("Error renaming file:", err);
+                return;
+              }
+              console.log(`File "${file}" renamed to "${newFilename}"`);
+              count = count+ 1
+            });
+          } catch (parseError) {
+            //console.error("Error parsing JSON in file:", file);
+            res.error("Error parsing JSON in file:", file)
+            return;
+          }
+        });
+      });
+    });
+        res.send(`complete ${count} files `);
+  })
+
   app.post("/guardar", function (req, res) {
     const contratoFileName = path.join(
       "./contratos",
@@ -81,17 +168,60 @@ module.exports = function (app) {
   });
 
   app.get("/", function (req, res) {
-    let files = fs.readdirSync("./contratos");
-    res.json(files);
-  });
+    const contratosFolder = "./contratos";
+
+    // Leer los años dentro del directorio "contratos"
+    const years = fs.readdirSync(contratosFolder);
+
+    // Crear una estructura JSON para almacenar los contratos ordenados por año y mes
+    const contractsByYear = {};
+
+    years.forEach(year => {
+        const yearFolder = path.join(contratosFolder, year);
+        const yearStats = fs.statSync(yearFolder);
+
+        // Verificar si el elemento es un directorio
+        if (yearStats.isDirectory()) {
+            const months = fs.readdirSync(yearFolder);
+
+            // Crear una estructura JSON para almacenar los contratos de cada año ordenados por mes
+            const contractsByMonth = {};
+
+            months.forEach(month => {
+                const monthFolder = path.join(yearFolder, month);
+                const monthStats = fs.statSync(monthFolder);
+
+                // Verificar si el elemento es un directorio
+                if (monthStats.isDirectory()) {
+                    const contracts = fs.readdirSync(monthFolder);
+
+                    // Almacenar los contratos de cada mes
+                    contractsByMonth[month] = contracts;
+                }
+            });
+
+            // Almacenar los contratos por año
+            contractsByYear[year] = contractsByMonth;
+        }
+    });
+
+    // Enviar la estructura JSON como respuesta
+    res.json(contractsByYear);
+});
 
   app.get("/:nombre_contrato", function (req, res) {
-    const contratoFileName = "./contratos/" + req.params.nombre_contrato;
+    const contratoFolder = "./contratos/";
+
+    const year = req.params.nombre_contrato.substring(0, 2);
+    const month = req.params.nombre_contrato.substring(req.params.nombre_contrato.length - 2);
+    const contratoFileName = path.join(contratoFolder, year, month, req.params.nombre_contrato);
+
+
     fs.readFile(contratoFileName, "utf8", (err, data) => {
       if (err) {
         res
           .status(404)
-          .send(`No se encontro contrato ${req.params.nombre_contrato}`);
+          .send(`No se encontro  ${contratoFileName}`);
         return;
       }
 
