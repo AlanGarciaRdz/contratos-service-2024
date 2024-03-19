@@ -21,4 +21,4 @@ app.use("/contratos", contratosRouter);
 
 app.listen(port);
 
-console.log("Express app started on port " + port);
+console.log(`Express app started on port ${port} - ${new Date()}`);
