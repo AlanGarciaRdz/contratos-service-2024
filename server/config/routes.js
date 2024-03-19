@@ -48,17 +48,17 @@ module.exports = function (app) {
       telefono_itinerario: req.body.telefono_itinerario,
       destino_itinerario: req.body.destino_itinerario,
       ubicacion_destino_itinerario: req.body.ubicacion_destino_itinerario,
-      fechasalida_itineario: req.body.fechasalida_itineario,
-      presentarse_itineario: req.body.presentarse_itineario,
-      horasalida_itineario: req.body.horasalida_itineario,
+      fechasalida_itinerario: req.body.fechasalida_itinerario,
+      presentarse_itinerario: req.body.presentarse_itinerario,
+      horasalida_itinerario: req.body.horasalida_itinerario,
       direccionsalida_itinerario: req.body.direccionsalida_itinerario,
       ubicacion_direccion_salida_itinerario:
       req.body.ubicacion_direccion_salida_itinerario,
       entrecalles_itinerario: req.body.entrecalles_itinerario,
       referencias_itinerario: req.body.referencias_itinerario,
-      detalles_itineario: req.body.detalles_itineario,
+      detalles_itinerario: req.body.detalles_itinerario,
       fecharegreso_itinerario: req.body.fecharegreso_itinerario,
-      horaregreso_itineario: req.body.horaregreso_itineario,
+      horaregreso_itinerario: req.body.horaregreso_itinerario,
       unidad_unidad: req.body.unidad_unidad,
       capacidad_unidad: req.body.capacidad_unidad,
       ACC_unidad: req.body.ACC_unidad,
@@ -72,6 +72,7 @@ module.exports = function (app) {
       anticipo_pagos: req.body.anticipo_pagos,
       pendiente_pagos: req.body.pendiente_pagos,
     };
+    console.log(response)
     writer.write(JSON.stringify(response));
 
     return res.send(response);
