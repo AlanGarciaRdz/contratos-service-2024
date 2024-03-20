@@ -34,6 +34,12 @@ module.exports = function (app) {
     res.send(clave);
   });
 
+  function ensureDirectoryExists(directory) {
+    if (!fs.existsSync(directory)) {
+      fs.mkdirSync(directory, { recursive: true });
+    }
+  }
+
   app.get("/fix", function (req, res) {
     const fs = require("fs");
     const path = require("path");
@@ -49,11 +55,7 @@ module.exports = function (app) {
       return new Date(year, month, day);
     }
 
-    function ensureDirectoryExists(directory) {
-      if (!fs.existsSync(directory)) {
-        fs.mkdirSync(directory, { recursive: true });
-      }
-    }
+
     let count= 0
 
     fs.readdir(contratosFolder, (err, files) => {
@@ -122,10 +124,19 @@ module.exports = function (app) {
   })
 
   app.post("/guardar", function (req, res) {
-    const contratoFileName = path.join(
-      "./contratos",
-      `${req.body.nombre_contrato}`
-    );
+    const contratoFolder = "./contratos/";
+
+    const yearFolder = req.body.nombre_contrato.substring(0, 2);
+    const monthFolder = req.body.nombre_contrato.substring(req.body.nombre_contrato.length - 2);
+
+    // Ensure year folder exists
+    ensureDirectoryExists(yearFolder);
+    // Ensure month folder exists
+    ensureDirectoryExists(monthFolder);
+
+    const contratoFileName = path.join(contratoFolder, yearFolder, monthFolder, req.body.nombre_contrato);
+
+
     let writer = fs.createWriteStream(contratoFileName);
 
     response = {
